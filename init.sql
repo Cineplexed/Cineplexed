@@ -16,3 +16,16 @@ CREATE TABLE Logs (
     content TEXT,
     timestamp TIMESTAMP
 );
+
+CREATE TABLE Guess (
+    userId VARCHAR(255) PRIMARY KEY,
+    date DATE,
+    guesses TEXT[]
+);
+
+CREATE TABLE Selections (
+    date DATE,
+    movie TEXT,
+    popularity INT,
+    percent_correct INT
+);
