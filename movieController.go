@@ -9,7 +9,20 @@ import (
 	"os"
 )
 
-func movieByName(c *gin.Context) {
+func moviesByName(c *gin.Context) {
+	body, err := c.GetRawData()
+	if err != nil {
+		fmt.Println("ERROR")
+	} else {
+		var entry Input
+		json.Unmarshal(body, &entry)
+		if entry.Title != "" {
+			c.IndentedJSON(http.StatusOK, getMovieByName(entry.Title))
+		}
+	}
+}
+
+func movieWithDetails(c *gin.Context) {
 	body, err := c.GetRawData()
 	if err != nil {
 		fmt.Println("ERROR")
@@ -18,8 +31,6 @@ func movieByName(c *gin.Context) {
 		json.Unmarshal(body, &entry)
 		if entry.ID != 0 {
 			c.IndentedJSON(http.StatusOK, getMovieWithDetail(entry.ID))
-		} else if entry.Title != "" {
-			c.IndentedJSON(http.StatusOK, getMovieByName(entry.Title))
 		}
 	}
 }
@@ -38,6 +49,7 @@ func main() {
 	getEnv()
 
 	router := gin.Default()
-	router.GET("/getMovie", movieByName)
+	router.GET("/getMovieOptions", moviesByName)
+	router.GET("/getMovieDetails", movieWithDetails)
 	router.Run(getHost())
 }
