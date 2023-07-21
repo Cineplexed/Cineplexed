@@ -5,6 +5,8 @@ import (
 	"net/http"
 	"encoding/json"
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
+	"os"
 )
 
 func movieByName(c *gin.Context) {
@@ -22,10 +24,20 @@ func movieByName(c *gin.Context) {
 	}
 }
 
+func getHost() string {
+	err := godotenv.Load(".env")
+	if err != nil {
+		fmt.Println("ERROR")
+		return ""
+	} else {
+		return os.Getenv("host")
+	}
+}
+
 func main() {	
-	key = getKey()
+	getEnv()
 
 	router := gin.Default()
 	router.GET("/getMovie", movieByName)
-	router.Run("0.0.0.0:5050")
+	router.Run(getHost())
 }

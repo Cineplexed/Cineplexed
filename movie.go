@@ -11,20 +11,22 @@ import (
 )
 
 var key string
+var baseUrl string
+var searchUrl string
 
-func getKey() string {
+func getEnv() {
 	err := godotenv.Load(".env")
 	if err != nil {
 		fmt.Println("ERROR")
-		return ""
 	} else {
 		key = os.Getenv("movieDBKey")
-		return key
+		baseUrl = os.Getenv("movieDBRootUrl")
+		searchUrl = os.Getenv("movieDBSearchUrl")
 	}
 }
 
 func getMovieByName(title string) MovieDBResponseArray {
-	req := "https://api.themoviedb.org/3/search/movie?api_key=" + key + "&query=" + strings.ReplaceAll(strings.TrimSpace(title), " ", "+")
+	req := searchUrl + "?api_key=" + key + "&query=" + strings.ReplaceAll(strings.TrimSpace(title), " ", "+")
 	response, err := http.Get(req)
 	if err != nil {
 		fmt.Println("ERROR")
@@ -35,7 +37,17 @@ func getMovieByName(title string) MovieDBResponseArray {
 		} else {
 			var entry MovieDBResponseArray
 			json.Unmarshal(body, &entry)
-			return entry
+
+			var limitedEntry MovieDBResponseArray
+			if (len(entry.Results) < 20) {
+				limitedEntry.Results = make([]MovieDBResponse, len(entry.Results))
+			} else {
+				limitedEntry.Results = make([]MovieDBResponse, 20)
+			}
+			for i := 0; i < len(limitedEntry.Results); i++ {
+				limitedEntry.Results[i] = entry.Results[i]
+			}
+			return limitedEntry
 		}
 	}
 	var entry MovieDBResponseArray
@@ -43,7 +55,7 @@ func getMovieByName(title string) MovieDBResponseArray {
 }
 
 func getMovieWithDetail(id int) MovieDetails {
-	movieDetailReq := "https://api.themoviedb.org/3/movie/" + fmt.Sprint(id) + "?api_key=" + key
+	movieDetailReq := baseUrl + "/" + fmt.Sprint(id) + "?api_key=" + key
 	response, err := http.Get(movieDetailReq)
 	if err != nil {
 		fmt.Println("ERROR")
@@ -55,7 +67,7 @@ func getMovieWithDetail(id int) MovieDetails {
 			var entry MovieDetails
 			json.Unmarshal(body, &entry)
 
-			movieActorReq := "https://api.themoviedb.org/3/movie/" + fmt.Sprint(id) + "/credits?api_key=" + key
+			movieActorReq := baseUrl + "/" + fmt.Sprint(id) + "/credits?api_key=" + key
 			response, err := http.Get(movieActorReq)
 			if err != nil {
 				fmt.Println("ERROR")
