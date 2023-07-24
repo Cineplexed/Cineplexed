@@ -21,6 +21,9 @@ type MovieDetails struct {
 	Revenue int `json:"revenue"`
 	Poster string `json:"poster_path"`
 	Actors []Actor `json:"actors"` 
+	ReleaseYear string `json:"release_date"`
+	Director string `json:"director"`
+	Producer string `json:"producer"`
 }
 
 type Genre struct {
@@ -35,7 +38,34 @@ type Actors struct {
 	Actors []Actor `json:"cast"`
 }
 
+type CrewMember struct {
+	Name string `json:"name"`
+	Job string `json:"job"`
+}
+
+type Crew struct {
+	EntireCrew []CrewMember `json:"crew"`
+}
+
+type Producer struct {
+	Name string `json:"name"`
+}
+
+type Producers struct {
+	Companies []Producer `json:"production_companies"`
+}
+
 type Input struct {
 	Title string `json:"title"`
 	ID int `json:"id"`
+}
+
+//lint:ignore U1000 Used for Swagger
+type docs_ID struct {
+	ID int `json:"id"`
+}
+
+//lint:ignore U1000 Used for Swagger
+type docs_Title struct {
+	Title string `json:"title"`
 }

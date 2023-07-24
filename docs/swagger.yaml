@@ -1,0 +1,58 @@
+basePath: /
+definitions:
+  main.docs_ID:
+    properties:
+      id:
+        type: integer
+    type: object
+  main.docs_Title:
+    properties:
+      title:
+        type: string
+    type: object
+host: localhost:5050
+info:
+  contact: {}
+  description: This is Cineplexed.
+  title: Gin Swagger Cineplexed
+  version: "1.0"
+paths:
+  /getMovieDetails:
+    get:
+      consumes:
+      - '*/*'
+      description: Get a movie with extensive details using it's ID
+      parameters:
+      - description: ID
+        in: body
+        name: Item
+        required: true
+        schema:
+          $ref: '#/definitions/main.docs_ID'
+      produces:
+      - application/json
+      responses: {}
+      summary: movieWithDetails
+      tags:
+      - movie
+  /getMovieOptions:
+    get:
+      consumes:
+      - '*/*'
+      description: Get a list of possible movies by it's title
+      parameters:
+      - description: Title
+        in: body
+        name: Item
+        required: true
+        schema:
+          $ref: '#/definitions/main.docs_Title'
+      produces:
+      - application/json
+      responses: {}
+      summary: moviesByName
+      tags:
+      - movie
+schemes:
+- http
+swagger: "2.0"

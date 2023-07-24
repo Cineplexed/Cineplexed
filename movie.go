@@ -66,6 +66,14 @@ func getMovieWithDetail(id int) MovieDetails {
 		} else {
 			var entry MovieDetails
 			json.Unmarshal(body, &entry)
+			
+			var producers Producers
+			json.Unmarshal(body, &producers)
+
+			if len(producers.Companies) > 0 {
+				entry.Producer = producers.Companies[0].Name
+			} 
+			entry.ReleaseYear = entry.ReleaseYear[0:4]
 
 			movieActorReq := baseUrl + "/" + fmt.Sprint(id) + "/credits?api_key=" + key
 			response, err := http.Get(movieActorReq)
@@ -78,6 +86,18 @@ func getMovieWithDetail(id int) MovieDetails {
 				} else {
 					var actors Actors
 					json.Unmarshal(body, &actors)
+
+					var crew Crew
+					json.Unmarshal(body, &crew)
+
+					for i := 0; i < len(crew.EntireCrew); i++ {
+						fmt.Println(crew.EntireCrew[i].Name + " " + crew.EntireCrew[i].Job)
+						if crew.EntireCrew[i].Job == "Producer" || crew.EntireCrew[i].Job == "Executive Producer" {
+							entry.Director = crew.EntireCrew[i].Name
+							break
+						}
+					}
+
 					var arr []Actor
 					if len(actors.Actors) < 10 {
 						arr = make([]Actor, len(actors.Actors))
