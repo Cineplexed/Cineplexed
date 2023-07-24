@@ -70,7 +70,9 @@ func getMovieWithDetail(id int) MovieDetails {
 			var producers Producers
 			json.Unmarshal(body, &producers)
 
-			entry.Producer = producers.Companies[0].Name
+			if len(producers.Companies) > 0 {
+				entry.Producer = producers.Companies[0].Name
+			} 
 			entry.ReleaseYear = entry.ReleaseYear[0:4]
 
 			movieActorReq := baseUrl + "/" + fmt.Sprint(id) + "/credits?api_key=" + key
