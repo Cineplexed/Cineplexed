@@ -59,3 +59,13 @@ type Input struct {
 	Title string `json:"title"`
 	ID int `json:"id"`
 }
+
+//lint:ignore U1000 Used for Swagger
+type docs_ID struct {
+	ID int `json:"id"`
+}
+
+//lint:ignore U1000 Used for Swagger
+type docs_Title struct {
+	Title string `json:"title"`
+}

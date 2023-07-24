@@ -1,0 +1,88 @@
+{
+    "schemes": [
+        "http"
+    ],
+    "swagger": "2.0",
+    "info": {
+        "description": "This is Cineplexed.",
+        "title": "Gin Swagger Cineplexed",
+        "contact": {},
+        "version": "1.0"
+    },
+    "host": "localhost:5050",
+    "basePath": "/",
+    "paths": {
+        "/getMovieDetails": {
+            "get": {
+                "description": "Get a movie with extensive details using it's ID",
+                "consumes": [
+                    "*/*"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "movie"
+                ],
+                "summary": "movieWithDetails",
+                "parameters": [
+                    {
+                        "description": "ID",
+                        "name": "Item",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/main.docs_ID"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/getMovieOptions": {
+            "get": {
+                "description": "Get a list of possible movies by it's title",
+                "consumes": [
+                    "*/*"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "movie"
+                ],
+                "summary": "moviesByName",
+                "parameters": [
+                    {
+                        "description": "Title",
+                        "name": "Item",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/main.docs_Title"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        }
+    },
+    "definitions": {
+        "main.docs_ID": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "main.docs_Title": {
+            "type": "object",
+            "properties": {
+                "title": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}
