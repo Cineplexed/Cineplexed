@@ -3,14 +3,15 @@ package main
 import (
 	"fmt"
 	"net/http"
-	"encoding/json"
+	"os"
+	"strconv"
+
+	_ "cineplexed.com/docs"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
-	"os"
-	"github.com/swaggo/gin-swagger"
-    "github.com/swaggo/files"
-	"github.com/gin-contrib/cors"
-	_ "cineplexed.com/docs"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 // moviesByName godoc
@@ -22,15 +23,10 @@ import (
 // @Produce json
 // @Router /getMovieOptions [GET]
 func moviesByName(c *gin.Context) {
-	body, err := c.GetRawData()
-	if err != nil {
-		fmt.Println("ERROR")
-	} else {
-		var entry Input
-		json.Unmarshal(body, &entry)
-		if entry.Title != "" {
-			c.IndentedJSON(http.StatusOK, getMovieByName(entry.Title))
-		}
+	title := c.Query("title")
+
+	if title != "" {
+		c.IndentedJSON(http.StatusOK, getMovieByName(title))
 	}
 }
 
@@ -43,15 +39,14 @@ func moviesByName(c *gin.Context) {
 // @Produce json
 // @Router /getMovieDetails [GET]
 func movieWithDetails(c *gin.Context) {
-	body, err := c.GetRawData()
+	id, err := strconv.Atoi(c.Query("id"))
 	if err != nil {
-		fmt.Println("ERROR")
-	} else {
-		var entry Input
-		json.Unmarshal(body, &entry)
-		if entry.ID != 0 {
-			c.IndentedJSON(http.StatusOK, getMovieWithDetail(entry.ID))
-		}
+		c.IndentedJSON(http.StatusBadRequest, err)
+		return
+	}
+
+	if id != 0 {
+		c.IndentedJSON(http.StatusOK, getMovieWithDetail(id))
 	}
 }
 
@@ -71,7 +66,7 @@ func getHost() string {
 // @host localhost:5050
 // @BasePath /
 // @schemes http
-func main() {	
+func main() {
 	getEnv()
 
 	router := gin.Default()
