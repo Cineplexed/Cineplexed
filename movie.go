@@ -8,11 +8,18 @@ import (
 	"strings"
 	"github.com/joho/godotenv"
 	"os"
+	"math/rand"
+	"time"
 )
 
 var key string
 var baseUrl string
 var searchUrl string
+var randUrl string
+
+var tomorrow time.Time
+var nextTime time.Time
+var updatingDaily = false
 
 func getEnv() {
 	err := godotenv.Load(".env")
@@ -22,10 +29,27 @@ func getEnv() {
 		key = os.Getenv("movieDBKey")
 		baseUrl = os.Getenv("movieDBRootUrl")
 		searchUrl = os.Getenv("movieDBSearchUrl")
+		randUrl = os.Getenv("movieDBRandUrl")
 	}
 }
 
+func checkTime() {
+	if time.Now().After(nextTime) && !updatingDaily {
+		updatingDaily = true
+		getDailyMovie()
+	}
+}
+
+func getTargetTime() {
+	var entry selections
+	db.Last(&entry)
+	tomorrow, _ = time.Parse("2006-01-02", strings.ReplaceAll(entry.Date, "/", "-"))
+	nextTime = time.Date(tomorrow.Year(), tomorrow.Month(), tomorrow.Day() + 1, 0, 0, 0, 0, time.Now().Location())
+	fmt.Println(nextTime)
+}
+
 func getMovieByName(title string) MovieDBResponseArray {
+	checkTime()
 	req := searchUrl + "?api_key=" + key + "&query=" + strings.ReplaceAll(strings.TrimSpace(title), " ", "+")
 	response, err := http.Get(req)
 	if err != nil {
@@ -55,6 +79,7 @@ func getMovieByName(title string) MovieDBResponseArray {
 }
 
 func getMovieWithDetail(id int) MovieDetails {
+	checkTime()
 	movieDetailReq := baseUrl + "/" + fmt.Sprint(id) + "?api_key=" + key
 	response, err := http.Get(movieDetailReq)
 	if err != nil {
@@ -73,7 +98,9 @@ func getMovieWithDetail(id int) MovieDetails {
 			if len(producers.Companies) > 0 {
 				entry.Producer = producers.Companies[0].Name
 			} 
-			entry.ReleaseYear = entry.ReleaseYear[0:4]
+			if len(entry.ReleaseYear) >= 4 { 
+				entry.ReleaseYear = entry.ReleaseYear[0:4]
+			}
 
 			movieActorReq := baseUrl + "/" + fmt.Sprint(id) + "/credits?api_key=" + key
 			response, err := http.Get(movieActorReq)
@@ -91,7 +118,6 @@ func getMovieWithDetail(id int) MovieDetails {
 					json.Unmarshal(body, &crew)
 
 					for i := 0; i < len(crew.EntireCrew); i++ {
-						fmt.Println(crew.EntireCrew[i].Name + " " + crew.EntireCrew[i].Job)
 						if crew.EntireCrew[i].Job == "Producer" || crew.EntireCrew[i].Job == "Executive Producer" {
 							entry.Director = crew.EntireCrew[i].Name
 							break
@@ -115,4 +141,59 @@ func getMovieWithDetail(id int) MovieDetails {
 	}
 	var entry MovieDetails
 	return entry
+}
+
+func getDailyMovie() {
+	fmt.Println("Generating movie")
+	page := rand.Intn(25) + 1
+	req := randUrl + "?api_key=" + key + "&page=" + fmt.Sprint(page) 
+	response, err := http.Get(req)
+	if err != nil {
+		fmt.Println("ERROR")
+	} else {
+		body, err := io.ReadAll(response.Body)
+		if err != nil {
+			fmt.Println("ERROR")
+		} else {
+			var collection MovieDBResponseArray
+			json.Unmarshal(body, &collection)
+			index := rand.Intn(20)
+			entry := collection.Results[index]
+			detailedEntry := getMovieWithDetail(entry.ID)
+
+			var arrGenres []string = make([]string, len(detailedEntry.Genres))
+			for i := 0; i < len(detailedEntry.Genres); i++ {
+				arrGenres[i] = string(detailedEntry.Genres[i].GenreVal)
+			}
+
+			var arrActors []string = make([]string, len(detailedEntry.Actors))
+			for i := 0; i < len(detailedEntry.Actors); i++ {
+				arrActors[i] = string(detailedEntry.Actors[i].Name)
+			}
+
+			var complete selections = selections{
+				Date: nextTime.Format("2006") + "/" + nextTime.Format("01") + "/" + nextTime.Format("02"), 
+				Movie: detailedEntry.Title, 
+				NumCorrect: 0,
+				NumIncorrect: 0,
+				Tagline: detailedEntry.Tagline,
+				Overview: detailedEntry.Overview,
+				Genres: arrGenres,
+				Actors: arrActors,
+				Revenue: detailedEntry.Revenue,
+				Poster: detailedEntry.Poster,
+				ReleaseYear: detailedEntry.ReleaseYear,
+				Director: detailedEntry.Director,
+				Producer: detailedEntry.Producer}
+			db.Table("selections")
+			result := db.Create(&complete)
+			if result.Error != nil {
+				fmt.Println(result.Error.Error())
+			} else {
+				fmt.Println("Daily movie updated to " + complete.Movie)
+			}
+		}
+	}
+	getTargetTime()
+	updatingDaily = true
 }
