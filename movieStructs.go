@@ -1,5 +1,7 @@
 package main
 
+import pq "github.com/lib/pq"
+
 type MovieDBResponseArray struct {
 	Results []MovieDBResponse `json:"results"`
 }
@@ -26,8 +28,24 @@ type MovieDetails struct {
 	Producer string `json:"producer"`
 }
 
+type selections struct {
+	Date string `gorm:"column:date"`
+	Movie string `gorm:"column:movie"`
+	NumCorrect int `gorm:"column:num_correct"`
+	NumIncorrect int `gorm:"column:num_incorrect"`
+	Tagline string `gorm:"column:tagline"`
+	Overview string `gorm:"column:overview"`
+	Genres pq.StringArray `gorm:"type:text[]; column:genres"`
+	Actors pq.StringArray `gorm:"type:text[]; column:actors"` 
+	Revenue int `gorm:"column:revenue"`
+	Poster string `gorm:"column:poster"`
+	ReleaseYear string `gorm:"column:year"`
+	Director string `gorm:"column:director"`
+	Producer string `gorm:"column:producer"`
+}
+
 type Genre struct {
-	Genre string `json:"name"`
+	GenreVal string `json:"name"`
 }
 
 type Actor struct {
