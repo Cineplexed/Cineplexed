@@ -16,3 +16,4 @@
 
 # Environment variables ignored
 .env
+__debug_bin
