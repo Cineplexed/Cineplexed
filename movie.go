@@ -99,6 +99,8 @@ func getMovieWithDetail(id int) MovieDetails {
 			} 
 			if len(entry.ReleaseYear) >= 4 { 
 				entry.ReleaseYear = entry.ReleaseYear[0:4]
+			} else {
+				entry.ReleaseYear = "Unreleased"
 			}
 
 			movieActorReq := baseUrl + "/" + fmt.Sprint(id) + "/credits?api_key=" + key
