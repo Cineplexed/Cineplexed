@@ -23,7 +23,6 @@ import (
 // @Router /getMovieOptions [GET]
 func moviesByName(c *gin.Context) {
 	title := c.Query("title")
-	fmt.Println(title)
 	if title != "" {
 		c.IndentedJSON(http.StatusOK, getMovieByName(title))
 	}
@@ -39,13 +38,11 @@ func moviesByName(c *gin.Context) {
 // @Router /getMovieDetails [GET]
 func movieWithDetails(c *gin.Context) {
 	id := c.Query("id")
-	fmt.Println(id)
 	numId, err := strconv.Atoi(id)
 	if err != nil {	
 		fmt.Println("ERROR")
 	} else {
 		if numId != 0 {
-			fmt.Println(getMovieWithDetail(numId))
 			c.IndentedJSON(http.StatusOK, getMovieWithDetail(numId))
 		}
 	}

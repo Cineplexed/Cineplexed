@@ -45,7 +45,6 @@ func getTargetTime() {
 	db.Last(&entry)
 	tomorrow, _ = time.Parse("2006-01-02", strings.ReplaceAll(entry.Date, "/", "-"))
 	nextTime = time.Date(tomorrow.Year(), tomorrow.Month(), tomorrow.Day() + 1, 0, 0, 0, 0, time.Now().Location())
-	fmt.Println(nextTime)
 }
 
 func getMovieByName(title string) MovieDBResponseArray {
@@ -118,7 +117,7 @@ func getMovieWithDetail(id int) MovieDetails {
 					json.Unmarshal(body, &crew)
 
 					for i := 0; i < len(crew.EntireCrew); i++ {
-						if crew.EntireCrew[i].Job == "Producer" || crew.EntireCrew[i].Job == "Executive Producer" {
+						if crew.EntireCrew[i].Job == "Director" {
 							entry.Director = crew.EntireCrew[i].Name
 							break
 						}
@@ -144,7 +143,6 @@ func getMovieWithDetail(id int) MovieDetails {
 }
 
 func getDailyMovie() {
-	fmt.Println("Generating movie")
 	page := rand.Intn(25) + 1
 	req := randUrl + "?api_key=" + key + "&page=" + fmt.Sprint(page) 
 	response, err := http.Get(req)
@@ -195,5 +193,5 @@ func getDailyMovie() {
 		}
 	}
 	getTargetTime()
-	updatingDaily = true
+	updatingDaily = false
 }
