@@ -76,6 +76,11 @@ func getMovieByName(title string) MovieDBResponseArray {
 			}
 			for i := 0; i < len(limitedEntry.Results); i++ {
 				limitedEntry.Results[i] = entry.Results[i]
+				if len(limitedEntry.Results[i].ReleaseYear) >= 4 {
+					limitedEntry.Results[i].ReleaseYear = limitedEntry.Results[i].ReleaseYear[0:4]
+				} else {
+					limitedEntry.Results[i].ReleaseYear = "Unreleased"
+				}
 			}
 			log("INFO", "given options")
 			return limitedEntry

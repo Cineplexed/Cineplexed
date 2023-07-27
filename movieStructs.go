@@ -9,6 +9,7 @@ type MovieDBResponseArray struct {
 type MovieDBResponse struct {
 	Title string `json:"title"`
 	ID int `json:"id"`
+	ReleaseYear string `json:"release_date"`
 }
 
 type MovieID struct {
