@@ -102,6 +102,13 @@ type Producers struct {
 	Companies []Producer `json:"production_companies"`
 }
 
+type Log struct {
+	ID string `gorm:"column:id"`
+	Severity string `gorm:"column:severity"`
+	Content string `gorm:"column:content"`
+	Timestamp string `gorm:"column:timestamp"`
+}
+
 type Input struct {
 	Title string `json:"title"`
 	ID int `json:"id"`

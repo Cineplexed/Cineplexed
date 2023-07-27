@@ -25,13 +25,14 @@ var updatingDaily = false
 func getEnv() {
 	err := godotenv.Load(".env")
 	if err != nil {
-		fmt.Println("ERROR")
+		log("ERROR", "Error loading environment variables")
 	} else {
 		key = os.Getenv("movieDBKey")
 		baseUrl = os.Getenv("movieDBRootUrl")
 		searchUrl = os.Getenv("movieDBSearchUrl")
 		randUrl = os.Getenv("movieDBRandUrl")
 	}
+	log("INFO", "Gotten environment variables")
 }
 
 func checkTime() {
@@ -50,6 +51,7 @@ func getTargetTime() {
 	} else {
 		nextTime = time.Date(time.Now().Year(), time.Now().Month(), time.Now().Day(), 0, 0, 0, 0, time.Now().Location())
 	}
+	log("INFO", "Gotten time for daily movie to swap")
 }
 
 func getMovieByName(title string) MovieDBResponseArray {
@@ -57,11 +59,11 @@ func getMovieByName(title string) MovieDBResponseArray {
 	req := searchUrl + "?api_key=" + key + "&query=" + strings.ReplaceAll(strings.TrimSpace(title), " ", "+")
 	response, err := http.Get(req)
 	if err != nil {
-		fmt.Println("ERROR")
+		log("ERROR", "Error fetching movie options")
 	} else {
 		body, err := io.ReadAll(response.Body)
 		if err != nil {
-			fmt.Println("ERROR")
+			log("ERROR", "Error reading response body")
 		} else {
 			var entry MovieDBResponseArray
 			json.Unmarshal(body, &entry)
@@ -75,9 +77,11 @@ func getMovieByName(title string) MovieDBResponseArray {
 			for i := 0; i < len(limitedEntry.Results); i++ {
 				limitedEntry.Results[i] = entry.Results[i]
 			}
+			log("INFO", "given options")
 			return limitedEntry
 		}
 	}
+	log("ERROR", "Something went wrong with getting options")
 	var entry MovieDBResponseArray
 	return entry
 }
@@ -87,11 +91,11 @@ func getMovieWithDetail(id int) Info {
 	movieDetailReq := baseUrl + "/" + fmt.Sprint(id) + "?api_key=" + key
 	response, err := http.Get(movieDetailReq)
 	if err != nil {
-		fmt.Println("ERROR")
+		log("ERROR", "Error fetching movie options")
 	} else {
 		body, err := io.ReadAll(response.Body)
 		if err != nil {
-			fmt.Println("ERROR")
+			log("ERROR", "Error reading response body")
 		} else {
 			var entry MovieDetails
 			json.Unmarshal(body, &entry)
@@ -111,11 +115,11 @@ func getMovieWithDetail(id int) Info {
 			movieActorReq := baseUrl + "/" + fmt.Sprint(id) + "/credits?api_key=" + key
 			response, err := http.Get(movieActorReq)
 			if err != nil {
-				fmt.Println("ERROR")
+				log("ERROR", "Error fetching movie options")
 			} else {
 				body, err := io.ReadAll(response.Body)
 				if err != nil {
-					fmt.Println("ERROR")
+					log("ERROR", "Error reading response body")
 				} else {
 					var actors Actors
 					json.Unmarshal(body, &actors)
@@ -177,12 +181,15 @@ func getMovieWithDetail(id int) Info {
 				compDetails.Genres = make([]Genre, 0)
 			}
 
+			log("INFO", "details given")
+
 			var info Info
 			info.GuessedMovie = entry
 			info.Compare = compDetails
 			return info
 		}
 	}
+	log("ERROR", "Something went wrong while getting details...")
 	var info Info
 	return info
 }
@@ -237,11 +244,11 @@ func getDailyMovie() {
 	req := randUrl + "?api_key=" + key + "&page=" + fmt.Sprint(page) 
 	response, err := http.Get(req)
 	if err != nil {
-		fmt.Println("ERROR")
+		log("ERROR", "Error fetching movies")
 	} else {
 		body, err := io.ReadAll(response.Body)
 		if err != nil {
-			fmt.Println("ERROR")
+			log("ERROR", "Error reading response body")
 		} else {
 			var collection MovieDBResponseArray
 			json.Unmarshal(body, &collection)
@@ -278,9 +285,9 @@ func getDailyMovie() {
 			db.Table("selections")
 			result := db.Create(&complete)
 			if result.Error != nil {
-				fmt.Println(result.Error.Error())
+				log("ERROR", "Error posting to postgres")
 			} else {
-				fmt.Println("Daily movie updated to " + complete.Movie)
+				log("INFO", "Daily movie updated to " + complete.Movie)
 			}
 		}
 	}
