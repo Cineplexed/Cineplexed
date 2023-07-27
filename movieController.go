@@ -30,9 +30,9 @@ func moviesByName(c *gin.Context) {
 	log("INFO", "Getting movie options...")
 	title := c.Query("title")
 	if title != "" {
-		c.IndentedJSON(http.StatusOK, getMovieByName(title))
+		c.JSON(http.StatusOK, getMovieByName(title))
 	} else {
-		c.IndentedJSON(http.StatusBadRequest, Response{Success: false, Context: "Please enter a title"})
+		c.JSON(http.StatusBadRequest, Response{Success: false, Context: "Please enter a title"})
 	}
 }
 
@@ -51,10 +51,10 @@ func movieWithDetails(c *gin.Context) {
 	numId, err := strconv.Atoi(id)
 	if err != nil {	
 		log("ERROR", "Cannot get movie details")
-		c.IndentedJSON(http.StatusBadRequest, Response{Success: false, Context: "Please enter an ID"})
+		c.JSON(http.StatusBadRequest, Response{Success: false, Context: "Please enter an ID"})
 	} else {
 		if numId != 0 {
-			c.IndentedJSON(http.StatusOK, getMovieWithDetail(numId))
+			c.JSON(http.StatusOK, getMovieWithDetail(numId))
 		}
 	}
 }
@@ -73,9 +73,9 @@ func getHint(c *gin.Context) {
 	result := db.Last(&entry)
 	if result.Error != nil {
 		fmt.Println(result.Error.Error())
-		c.IndentedJSON(http.StatusBadRequest, Response{Success: false, Context: result.Error.Error()})
+		c.JSON(http.StatusBadRequest, Response{Success: false, Context: result.Error.Error()})
 	} else {
-		c.IndentedJSON(http.StatusOK, Hint{Tagline: entry.Tagline, Overview: entry.Overview})
+		c.JSON(http.StatusOK, Hint{Tagline: entry.Tagline, Overview: entry.Overview})
 		log("INFO", "Hint given")
 	}
 }
@@ -95,12 +95,12 @@ func makeUser(c *gin.Context) {
 	json.Unmarshal(body, &creds)
 	if err != nil {
 		log("ERROR", "Failed to create user")
-		c.IndentedJSON(http.StatusBadRequest, Response{Success: false, Context: "Failed to read request body"})
+		c.JSON(http.StatusBadRequest, Response{Success: false, Context: "Failed to read request body"})
 	} else {
 		hash, err := bcrypt.GenerateFromPassword([]byte(creds.Password), bcrypt.DefaultCost)
 		if err != nil {
 			log("ERROR", "Failed to encrypt user data")
-			c.IndentedJSON(http.StatusBadRequest, Response{Success: false, Context: "Failed to encrypt"})
+			c.JSON(http.StatusBadRequest, Response{Success: false, Context: "Failed to encrypt"})
 		} else {
 			var user = User{
 				ID: uuid.New().String(), 
@@ -116,10 +116,10 @@ func makeUser(c *gin.Context) {
 			result := db.Create(&user)
 			if result.Error != nil {
 				log("ERROR", "Failed to post user data to postgres")
-				c.IndentedJSON(http.StatusBadRequest, Response{Success: false, Context: result.Error.Error()})
+				c.JSON(http.StatusBadRequest, Response{Success: false, Context: result.Error.Error()})
 			} else {
 				log("INFO", "Created user")
-				c.IndentedJSON(http.StatusOK, Response{Success: true, Context: "Created User"})
+				c.JSON(http.StatusOK, Response{Success: true, Context: "Created User"})
 			}
 		}
 	}
@@ -138,7 +138,7 @@ func validateUser(c *gin.Context) {
 	body, err := c.GetRawData()
 	if err != nil {
 		log("ERROR", "Error reading response body")
-		c.IndentedJSON(http.StatusBadRequest, Response{Success: false, Context: "Failed to read request body"})
+		c.JSON(http.StatusBadRequest, Response{Success: false, Context: "Failed to read request body"})
 	} else {
 		var creds Users
 		json.Unmarshal(body, &creds)
@@ -150,16 +150,16 @@ func validateUser(c *gin.Context) {
 			if err != nil {
 				fmt.Println(err)
 				log("WARNING", "Incorrect credentials on log in")
-				c.IndentedJSON(http.StatusBadRequest, Response{Success: false, Context: "Please enter a valid username and password"})
+				c.JSON(http.StatusBadRequest, Response{Success: false, Context: "Please enter a valid username and password"})
 			} else {
 				var key UserInfo
 				db.Table("users").Where("username = ? AND password = ?", creds.Username, validateCreds.Password).First(&key)
 				log("INFO", "Validated user")
-				c.IndentedJSON(http.StatusOK, key)
+				c.JSON(http.StatusOK, key)
 			}
 		} else {
 			log("WARNING", "Attempted to sign into inactive account")
-			c.IndentedJSON(http.StatusOK, Response{Success: false, Context: "Please enter a valid username and password"})
+			c.JSON(http.StatusOK, Response{Success: false, Context: "Please enter a valid username and password"})
 		}
 	}
 }
@@ -177,29 +177,29 @@ func deleteUser(c *gin.Context) {
 	header := c.Request.Header["User-Id"]
 	if len(header) == 0 {
 		log("ERROR", "Invalid User-Id given")
-		c.IndentedJSON(http.StatusBadRequest, Response{Success: false, Context: "Please enter a User ID"})
+		c.JSON(http.StatusBadRequest, Response{Success: false, Context: "Please enter a User ID"})
 	} else {
 		var entry User
 		result := db.Where("id = ?", string(header[0])).First(&entry)
 		if entry.Active {
 			if result.Error != nil {
 				log("ERROR", "Invalid User-Id given")
-				c.IndentedJSON(http.StatusBadRequest, Response{Success: false, Context: "Please enter a valid User ID"})
+				c.JSON(http.StatusBadRequest, Response{Success: false, Context: "Please enter a valid User ID"})
 			} else {
 				entry.Active = false
 				entry.DeletedAt = time.Now().String()
 				result := db.Save(&entry)
 				if result.Error != nil {
 					log("ERROR", "Failed to post deletion to postgres")
-					c.IndentedJSON(http.StatusBadRequest, Response{Success: false, Context: result.Error.Error()})
+					c.JSON(http.StatusBadRequest, Response{Success: false, Context: result.Error.Error()})
 				} else {
 					log("INFO", "Deleted user")
-					c.IndentedJSON(http.StatusOK, Response{Success: true, Context: "Deleted User"})
+					c.JSON(http.StatusOK, Response{Success: true, Context: "Deleted User"})
 				}
 			}
 		} else {
 			log("ERROR", "Attempted to delete an inactive account")
-			c.IndentedJSON(http.StatusBadRequest, Response{Success: false, Context: "Please enter a valid user ID"})
+			c.JSON(http.StatusBadRequest, Response{Success: false, Context: "Please enter a valid user ID"})
 		}
 	}
 }
@@ -218,19 +218,19 @@ func updateUser(c *gin.Context) {
 	header := c.Request.Header["User-Id"]
 	if len(header) == 0 {
 		log("ERROR", "Invalid User-Id given")
-		c.IndentedJSON(http.StatusBadRequest, Response{Success: false, Context: "Please enter a valid user ID"})
+		c.JSON(http.StatusBadRequest, Response{Success: false, Context: "Please enter a valid user ID"})
 	} else {
 		body, err := c.GetRawData()
 		if err != nil {
 			log("ERROR", "Failed to read request body")
-			c.IndentedJSON(http.StatusBadRequest, Response{Success: false, Context: "Failed to read request body"})
+			c.JSON(http.StatusBadRequest, Response{Success: false, Context: "Failed to read request body"})
 		} else {
 			var entry User
 			result := db.Where("id = ?", string(header[0])).First(&entry)
 			if entry.Active {
 				if result.Error != nil {
 					log("ERROR", "Invalid User-Id given")
-					c.IndentedJSON(http.StatusBadRequest, Response{Success: false, Context: "Please enter a valid user ID"})
+					c.JSON(http.StatusBadRequest, Response{Success: false, Context: "Please enter a valid user ID"})
 				} else {
 					var creds Users
 					json.Unmarshal(body, &creds)
@@ -238,7 +238,7 @@ func updateUser(c *gin.Context) {
 					hash, err := bcrypt.GenerateFromPassword([]byte(creds.Password), bcrypt.DefaultCost)
 					if err != nil {
 						log("ERROR", "Failed to encrypt")
-						c.IndentedJSON(http.StatusBadRequest, Response{Success: false, Context: "Failed to encrypt"})
+						c.JSON(http.StatusBadRequest, Response{Success: false, Context: "Failed to encrypt"})
 					} else {
 						entry.Username = creds.Username
 						entry.Password = string(hash)
@@ -246,16 +246,16 @@ func updateUser(c *gin.Context) {
 						result := db.Save(&entry)
 						if result.Error != nil {
 							log("ERROR", "Could not post user info to postgres")
-							c.IndentedJSON(http.StatusBadRequest, Response{Success: false, Context: result.Error.Error()})
+							c.JSON(http.StatusBadRequest, Response{Success: false, Context: result.Error.Error()})
 						} else {
 							log("INFO", "Updated user info")
-							c.IndentedJSON(http.StatusOK, Response{Success: true, Context: "Updated info"})
+							c.JSON(http.StatusOK, Response{Success: true, Context: "Updated info"})
 						}
 					}
 				}
 			} else {
 				log("WARNING", "Attempted to update inactive account")
-				c.IndentedJSON(http.StatusBadRequest, Response{Success: false, Context: "Please enter a valid user ID"})
+				c.JSON(http.StatusBadRequest, Response{Success: false, Context: "Please enter a valid user ID"})
 			}
 
 		}
@@ -277,7 +277,7 @@ func finishGame(c *gin.Context) {
 	body, err := c.GetRawData()
 	if err != nil {
 		log("ERROR", "Failed to read request body")
-		c.IndentedJSON(http.StatusBadRequest, Response{Success: false, Context: "Failed to read request body"})
+		c.JSON(http.StatusBadRequest, Response{Success: false, Context: "Failed to read request body"})
 	} else {
 		var status GameStatus
 		json.Unmarshal(body, &status)
@@ -286,7 +286,7 @@ func finishGame(c *gin.Context) {
 		if len(header) != 0 {
 			if len(header[0]) == 0 {
 				log("ERROR", "Invalid user-id entered")
-				c.IndentedJSON(http.StatusBadRequest, Response{Success: false, Context: "Please enter a valid user ID"})
+				c.JSON(http.StatusBadRequest, Response{Success: false, Context: "Please enter a valid user ID"})
 				userFailed = true
 			} else {
 				var entry User
@@ -294,7 +294,7 @@ func finishGame(c *gin.Context) {
 				if entry.Active {
 					if result.Error != nil {
 						log("ERROR", "Invalid user ID entered")
-						c.IndentedJSON(http.StatusBadRequest, Response{Success: false, Context: "Please enter a valid user ID"})
+						c.JSON(http.StatusBadRequest, Response{Success: false, Context: "Please enter a valid user ID"})
 						userFailed = true
 					} else {
 						if status.Won {
@@ -306,7 +306,7 @@ func finishGame(c *gin.Context) {
 						result := db.Save(&entry)
 						if result.Error != nil {
 							log("ERROR", "Failed to post info to postgres")
-							c.IndentedJSON(http.StatusBadRequest, Response{Success: false, Context: "Failed to post info to postgres"})
+							c.JSON(http.StatusBadRequest, Response{Success: false, Context: "Failed to post info to postgres"})
 							userFailed = true
 						} else {
 							log("INFO", "Submitted daily win info")
@@ -314,7 +314,7 @@ func finishGame(c *gin.Context) {
 					}
 				} else {
 					log("ERROR", "Attempted to complete a puzzle on inactive account")
-					c.IndentedJSON(http.StatusBadRequest, Response{Success: false, Context: "Please enter a valid user ID"})
+					c.JSON(http.StatusBadRequest, Response{Success: false, Context: "Please enter a valid user ID"})
 					userFailed = true
 				}
 			}
@@ -324,7 +324,7 @@ func finishGame(c *gin.Context) {
 			result := db.Last(&daily)
 			if result.Error != nil {
 				log("ERROR", "Failed to pull info from postgres")
-				c.IndentedJSON(http.StatusBadRequest, Response{Success: false, Context: result.Error.Error()})
+				c.JSON(http.StatusBadRequest, Response{Success: false, Context: result.Error.Error()})
 			} else {
 				if status.Won {
 					daily.NumCorrect = daily.NumCorrect + 1
@@ -337,10 +337,10 @@ func finishGame(c *gin.Context) {
 				})
 				if result.Error != nil {
 					log("ERROR", "Failed to post info to postgres")
-					c.IndentedJSON(http.StatusBadRequest, Response{Success: false, Context: "Failed to post info to postgres"})
+					c.JSON(http.StatusBadRequest, Response{Success: false, Context: "Failed to post info to postgres"})
 				} else {
 					log("INFO", "Submitted daily info")
-					c.IndentedJSON(http.StatusOK, Response{Success: true, Context: "Submitted info"})
+					c.JSON(http.StatusOK, Response{Success: true, Context: "Submitted info"})
 				}
 			}
 		}
@@ -366,6 +366,8 @@ func getHost() string {
 func main() {
 	getEnv()
 	getTargetTime()
+	
+	gin.SetMode(gin.ReleaseMode)
 	router := gin.Default()
 
 	config := cors.DefaultConfig()

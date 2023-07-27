@@ -68,10 +68,10 @@ func getMovieByName(title string) MovieDBResponseArray {
 			json.Unmarshal(body, &entry)
 
 			var limitedEntry MovieDBResponseArray
-			if (len(entry.Results) < 20) {
+			if (len(entry.Results) < 10) {
 				limitedEntry.Results = make([]MovieDBResponse, len(entry.Results))
 			} else {
-				limitedEntry.Results = make([]MovieDBResponse, 20)
+				limitedEntry.Results = make([]MovieDBResponse, 10)
 			}
 			for i := 0; i < len(limitedEntry.Results); i++ {
 				limitedEntry.Results[i] = entry.Results[i]
