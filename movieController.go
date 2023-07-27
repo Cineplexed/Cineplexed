@@ -78,7 +78,7 @@ func main() {
 
 	router.GET("/getMovieOptions", moviesByName)
 	router.GET("/getMovieDetails", movieWithDetails)
-
+	
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	router.Run(getHost())

@@ -25,7 +25,9 @@ type MovieDetails struct {
 	Actors []Actor `json:"actors"` 
 	ReleaseYear string `json:"release_date"`
 	Director string `json:"director"`
-	Producer string `json:"producer"`
+	Producer string `json:"distributor"`
+	IMDB string `json:"imdb_id"`
+	Collection MovieCollection `json:"belongs_to_collection"`
 }
 
 type selections struct {
@@ -42,6 +44,32 @@ type selections struct {
 	ReleaseYear string `gorm:"column:year"`
 	Director string `gorm:"column:director"`
 	Producer string `gorm:"column:producer"`
+	IMDB string `gorm:"column:imdbId"`
+	Collection string `gorm:"column:collection"`
+}
+
+type Info struct {
+	GuessedMovie MovieDetails `json:"GuessedMovie"`
+	Compare Comparison `json:"Comparison"`
+}
+
+type Hint struct {
+	Tagline string `json:"tagline"`
+	Overview string `json:"overview"`
+}
+
+type MovieCollection struct {
+	Name string `json:"name"`
+}
+
+type Comparison struct {
+	Correct bool `json:"correct"`
+	Collection bool `json:"collection"`
+	YearComparison int `json:"yearComparison"`
+	GrossComparison int `json:"revenueComparison"`
+	DirectorComparison bool `json:"directorComparison"`
+	Genres []Genre `json:"genres"`
+	Actors []Actor `json:"actors"`
 }
 
 type Genre struct {
@@ -50,6 +78,7 @@ type Genre struct {
 
 type Actor struct {
 	Name string `json:"name"`
+	Headshot string `json:"profile_path"`
 }
 
 type Actors struct {
