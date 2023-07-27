@@ -16,6 +16,22 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/getHint": {
+            "get": {
+                "description": "Get a hint towards the daily movie",
+                "consumes": [
+                    "*/*"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "movie"
+                ],
+                "summary": "Hint",
+                "responses": {}
+            }
+        },
         "/getMovieDetails": {
             "get": {
                 "description": "Get a movie with extensive details using it's ID",

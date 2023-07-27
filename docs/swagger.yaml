@@ -17,6 +17,17 @@ info:
   title: Gin Swagger Cineplexed
   version: "1.0"
 paths:
+  /getHint:
+    get:
+      consumes:
+      - '*/*'
+      description: Get a hint towards the daily movie
+      produces:
+      - application/json
+      responses: {}
+      summary: Hint
+      tags:
+      - movie
   /getMovieDetails:
     get:
       consumes:

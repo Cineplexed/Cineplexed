@@ -48,6 +48,23 @@ func movieWithDetails(c *gin.Context) {
 	}
 }
 
+// Hint godoc
+// @Summary Hint
+// @Description Get a hint towards the daily movie
+// @Tags movie
+// @Accept */*
+// @Produce json
+// @Router /getHint [GET]
+func getHint(c *gin.Context) {
+	var entry selections
+	result := db.Last(&entry)
+	if result.Error != nil {
+		fmt.Println(result.Error.Error())
+	} else {
+		c.IndentedJSON(http.StatusOK, Hint{Tagline: entry.Tagline, Overview: entry.Overview})
+	}
+}
+
 func getHost() string {
 	err := godotenv.Load(".env")
 	if err != nil {
@@ -78,7 +95,8 @@ func main() {
 
 	router.GET("/getMovieOptions", moviesByName)
 	router.GET("/getMovieDetails", movieWithDetails)
-	
+	router.GET("/getHint", getHint)
+
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	router.Run(getHost())
