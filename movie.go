@@ -55,7 +55,6 @@ func getTargetTime() {
 }
 
 func getMovieByName(title string) MovieDBResponseArray {
-	checkTime()
 	req := searchUrl + "?api_key=" + key + "&query=" + strings.ReplaceAll(strings.TrimSpace(title), " ", "+")
 	response, err := http.Get(req)
 	if err != nil {
@@ -92,7 +91,6 @@ func getMovieByName(title string) MovieDBResponseArray {
 }
 
 func getMovieWithDetail(id int) Info {
-	checkTime()
 	movieDetailReq := baseUrl + "/" + fmt.Sprint(id) + "?api_key=" + key
 	response, err := http.Get(movieDetailReq)
 	if err != nil {

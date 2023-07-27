@@ -49,6 +49,32 @@ type selections struct {
 	Collection string `gorm:"column:collection"`
 }
 
+type User struct {
+	ID string `gorm:"column:id"`
+	Username string `gorm:"column:username"`
+	Password string `gorm:"column:password"`
+	CreatedAt string `gorm:"column:created_at"`
+	DeletedAt string `gorm:"column:deleted_at"`
+	UpdatedAt string `gorm:"column:updated_at"`
+	SolvedPuzzles int `gorm:"column:solved_puzzles"`
+	FailedPuzzles int `gorm:"column:failed_puzzles"`
+	LastSolvedPuzzle string `gorm:"column:last_solved_puzzle"`
+	Active bool `gorm:"column:active"`
+}
+
+type GameStatus struct {
+	Won bool `json:"won"`
+}
+
+type Users struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
+
+type UserInfo struct {
+	UserID string `gorm:"column:id" json:"id"`
+}
+
 type Info struct {
 	GuessedMovie MovieDetails `json:"GuessedMovie"`
 	Compare Comparison `json:"Comparison"`
@@ -113,6 +139,11 @@ type Log struct {
 type Input struct {
 	Title string `json:"title"`
 	ID int `json:"id"`
+}
+
+type Response struct {
+	Success bool `json:"success"`
+	Context string `json:"context"`
 }
 
 //lint:ignore U1000 Used for Swagger
