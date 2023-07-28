@@ -16,6 +16,80 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/deleteUser": {
+            "delete": {
+                "description": "delete a user with a User-Id",
+                "consumes": [
+                    "*/*"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "deleteUser",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "UserID",
+                        "name": "User-Id",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/finishGame": {
+            "post": {
+                "description": "update success rates of user and daily",
+                "consumes": [
+                    "*/*"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "finishGame",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "UserID",
+                        "name": "User-Id",
+                        "in": "header"
+                    },
+                    {
+                        "description": "User Data",
+                        "name": "UserData",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/main.Users"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/getHint": {
+            "get": {
+                "description": "Get a hint towards the daily movie",
+                "consumes": [
+                    "*/*"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "movie"
+                ],
+                "summary": "Hint",
+                "responses": {}
+            }
+        },
         "/getMovieDetails": {
             "get": {
                 "description": "Get a movie with extensive details using it's ID",
@@ -69,9 +143,108 @@ const docTemplate = `{
                 ],
                 "responses": {}
             }
+        },
+        "/makeUser": {
+            "post": {
+                "description": "create a new user",
+                "consumes": [
+                    "*/*"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "makeUser",
+                "parameters": [
+                    {
+                        "description": "User Data",
+                        "name": "UserData",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/main.Users"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/updateUser": {
+            "patch": {
+                "description": "update a user with a User-Id and new username and password",
+                "consumes": [
+                    "*/*"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "updateUser",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "UserID",
+                        "name": "User-Id",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "User Data",
+                        "name": "UserData",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/main.Users"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/validateUser": {
+            "post": {
+                "description": "validate a user with a username and password",
+                "consumes": [
+                    "*/*"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "validateUser",
+                "parameters": [
+                    {
+                        "description": "User Data",
+                        "name": "UserData",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/main.Users"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
         }
     },
     "definitions": {
+        "main.Users": {
+            "type": "object",
+            "properties": {
+                "password": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
         "main.docs_ID": {
             "type": "object",
             "properties": {

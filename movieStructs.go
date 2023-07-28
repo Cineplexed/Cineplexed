@@ -9,6 +9,7 @@ type MovieDBResponseArray struct {
 type MovieDBResponse struct {
 	Title string `json:"title"`
 	ID int `json:"id"`
+	ReleaseYear string `json:"release_date"`
 }
 
 type MovieID struct {
@@ -25,7 +26,9 @@ type MovieDetails struct {
 	Actors []Actor `json:"actors"` 
 	ReleaseYear string `json:"release_date"`
 	Director string `json:"director"`
-	Producer string `json:"producer"`
+	Producer string `json:"distributor"`
+	IMDB string `json:"imdb_id"`
+	Collection MovieCollection `json:"belongs_to_collection"`
 }
 
 type selections struct {
@@ -42,6 +45,58 @@ type selections struct {
 	ReleaseYear string `gorm:"column:year"`
 	Director string `gorm:"column:director"`
 	Producer string `gorm:"column:producer"`
+	IMDB string `gorm:"column:imdbId"`
+	Collection string `gorm:"column:collection"`
+}
+
+type User struct {
+	ID string `gorm:"column:id"`
+	Username string `gorm:"column:username"`
+	Password string `gorm:"column:password"`
+	CreatedAt string `gorm:"column:created_at"`
+	DeletedAt string `gorm:"column:deleted_at"`
+	UpdatedAt string `gorm:"column:updated_at"`
+	SolvedPuzzles int `gorm:"column:solved_puzzles"`
+	FailedPuzzles int `gorm:"column:failed_puzzles"`
+	LastSolvedPuzzle string `gorm:"column:last_solved_puzzle"`
+	Active bool `gorm:"column:active"`
+}
+
+type GameStatus struct {
+	Won bool `json:"won"`
+}
+
+type Users struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
+
+type UserInfo struct {
+	UserID string `gorm:"column:id" json:"id"`
+}
+
+type Info struct {
+	GuessedMovie MovieDetails `json:"GuessedMovie"`
+	Compare Comparison `json:"Comparison"`
+}
+
+type Hint struct {
+	Tagline string `json:"tagline"`
+	Overview string `json:"overview"`
+}
+
+type MovieCollection struct {
+	Name string `json:"name"`
+}
+
+type Comparison struct {
+	Correct bool `json:"correct"`
+	Collection bool `json:"collection"`
+	YearComparison int `json:"yearComparison"`
+	GrossComparison int `json:"revenueComparison"`
+	DirectorComparison bool `json:"directorComparison"`
+	Genres []Genre `json:"genres"`
+	Actors []Actor `json:"actors"`
 }
 
 type Genre struct {
@@ -50,6 +105,7 @@ type Genre struct {
 
 type Actor struct {
 	Name string `json:"name"`
+	Headshot string `json:"profile_path"`
 }
 
 type Actors struct {
@@ -73,9 +129,21 @@ type Producers struct {
 	Companies []Producer `json:"production_companies"`
 }
 
+type Log struct {
+	ID string `gorm:"column:id"`
+	Severity string `gorm:"column:severity"`
+	Content string `gorm:"column:content"`
+	Timestamp string `gorm:"column:timestamp"`
+}
+
 type Input struct {
 	Title string `json:"title"`
 	ID int `json:"id"`
+}
+
+type Response struct {
+	Success bool `json:"success"`
+	Context string `json:"context"`
 }
 
 //lint:ignore U1000 Used for Swagger

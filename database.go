@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"os"
 	"gorm.io/driver/postgres"
+	"github.com/google/uuid"
+	"time"
 )
 
 var db = connectDB()
@@ -21,9 +23,21 @@ func connectDB() *gorm.DB {
 			fmt.Println(err.Error())
 		} else {
 			db.AutoMigrate(&selections{})
-			fmt.Println("Connected...")
+			fmt.Println("Connected to Database...")
 			return db
 		}
 	}
 	return nil
+}
+
+func log(severity string, content string) {
+	var entry Log
+	entry.ID = uuid.New().String()
+	entry.Severity = severity
+	entry.Content = content
+	entry.Timestamp = time.Now().String()
+	result := db.Create(&entry)
+	if result.Error != nil {
+		fmt.Println(result.Error.Error())
+	}
 }

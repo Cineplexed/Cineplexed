@@ -1,5 +1,12 @@
 basePath: /
 definitions:
+  main.Users:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    type: object
   main.docs_ID:
     properties:
       id:
@@ -17,6 +24,56 @@ info:
   title: Gin Swagger Cineplexed
   version: "1.0"
 paths:
+  /deleteUser:
+    delete:
+      consumes:
+      - '*/*'
+      description: delete a user with a User-Id
+      parameters:
+      - description: UserID
+        in: header
+        name: User-Id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses: {}
+      summary: deleteUser
+      tags:
+      - users
+  /finishGame:
+    post:
+      consumes:
+      - '*/*'
+      description: update success rates of user and daily
+      parameters:
+      - description: UserID
+        in: header
+        name: User-Id
+        type: string
+      - description: User Data
+        in: body
+        name: UserData
+        required: true
+        schema:
+          $ref: '#/definitions/main.Users'
+      produces:
+      - application/json
+      responses: {}
+      summary: finishGame
+      tags:
+      - users
+  /getHint:
+    get:
+      consumes:
+      - '*/*'
+      description: Get a hint towards the daily movie
+      produces:
+      - application/json
+      responses: {}
+      summary: Hint
+      tags:
+      - movie
   /getMovieDetails:
     get:
       consumes:
@@ -53,6 +110,65 @@ paths:
       summary: moviesByName
       tags:
       - movie
+  /makeUser:
+    post:
+      consumes:
+      - '*/*'
+      description: create a new user
+      parameters:
+      - description: User Data
+        in: body
+        name: UserData
+        required: true
+        schema:
+          $ref: '#/definitions/main.Users'
+      produces:
+      - application/json
+      responses: {}
+      summary: makeUser
+      tags:
+      - users
+  /updateUser:
+    patch:
+      consumes:
+      - '*/*'
+      description: update a user with a User-Id and new username and password
+      parameters:
+      - description: UserID
+        in: header
+        name: User-Id
+        required: true
+        type: string
+      - description: User Data
+        in: body
+        name: UserData
+        required: true
+        schema:
+          $ref: '#/definitions/main.Users'
+      produces:
+      - application/json
+      responses: {}
+      summary: updateUser
+      tags:
+      - users
+  /validateUser:
+    post:
+      consumes:
+      - '*/*'
+      description: validate a user with a username and password
+      parameters:
+      - description: User Data
+        in: body
+        name: UserData
+        required: true
+        schema:
+          $ref: '#/definitions/main.Users'
+      produces:
+      - application/json
+      responses: {}
+      summary: validateUser
+      tags:
+      - users
 schemes:
 - http
 swagger: "2.0"
