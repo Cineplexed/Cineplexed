@@ -25,4 +25,4 @@ Requires a valid MovieDB API key.
 
 ## Getting Started
 
-Ensure you have the go.mod and go.sum file and that they are correctly pathed. Furthermore, ensure all enviornment variables have been set to match your needs. After this you should be able to run movieController.go in order to start the application.
+Ensure you have the go.mod and go.sum file and that they are correctly pathed. Furthermore, ensure all enviornment variables have been set to match your needs. After this you should be able to execute "run go ." in order to start the application.
