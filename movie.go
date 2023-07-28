@@ -44,14 +44,18 @@ func checkTime() {
 
 func getTargetTime() {
 	var entry selections
-	db.Last(&entry)
-	if len(entry.Date) > 0 {
-		tomorrow, _ = time.Parse("2006-01-02", strings.ReplaceAll(entry.Date, "/", "-"))
-		nextTime = time.Date(tomorrow.Year(), tomorrow.Month(), tomorrow.Day() + 1, 0, 0, 0, 0, time.Now().Location())
+	result := db.Last(&entry)
+	if result.Error == nil {
+		if len(entry.Date) > 0 {
+			tomorrow, _ = time.Parse("2006-01-02", strings.ReplaceAll(entry.Date, "/", "-"))
+			nextTime = time.Date(tomorrow.Year(), tomorrow.Month(), tomorrow.Day() + 1, 0, 0, 0, 0, time.Now().Location())
+		} else {
+			nextTime = time.Date(time.Now().Year(), time.Now().Month(), time.Now().Day(), 0, 0, 0, 0, time.Now().Location())
+		}
+		log("INFO", "Gotten time for daily movie to swap")
 	} else {
-		nextTime = time.Date(time.Now().Year(), time.Now().Month(), time.Now().Day(), 0, 0, 0, 0, time.Now().Location())
+		getDailyMovie()
 	}
-	log("INFO", "Gotten time for daily movie to swap")
 }
 
 func getMovieByName(title string) MovieDBResponseArray {

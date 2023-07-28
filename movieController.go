@@ -45,7 +45,6 @@ func moviesByName(c *gin.Context) {
 // @Produce json
 // @Router /getMovieDetails [GET]
 func movieWithDetails(c *gin.Context) {
-	checkTime()
 	log("INFO", "Getting movie details...")
 	id := c.Query("id")
 	numId, err := strconv.Atoi(id)
@@ -67,7 +66,6 @@ func movieWithDetails(c *gin.Context) {
 // @Produce json
 // @Router /getHint [GET]
 func getHint(c *gin.Context) {
-	checkTime()
 	log("INFO", "Getting hint...")
 	var entry selections
 	result := db.Last(&entry)
@@ -89,7 +87,6 @@ func getHint(c *gin.Context) {
 // @Produce json
 // @Router /makeUser [POST]
 func makeUser(c *gin.Context) {
-	checkTime()
 	body, err := c.GetRawData()
 	var creds Users
 	json.Unmarshal(body, &creds)
@@ -134,7 +131,6 @@ func makeUser(c *gin.Context) {
 // @Produce json
 // @Router /validateUser [POST]
 func validateUser(c *gin.Context) {
-	checkTime()
 	body, err := c.GetRawData()
 	if err != nil {
 		log("ERROR", "Error reading response body")
@@ -173,7 +169,6 @@ func validateUser(c *gin.Context) {
 // @Produce json
 // @Router /deleteUser [DELETE]
 func deleteUser(c *gin.Context) {
-	checkTime()
 	header := c.Request.Header["User-Id"]
 	if len(header) == 0 {
 		log("ERROR", "Invalid User-Id given")
@@ -214,7 +209,6 @@ func deleteUser(c *gin.Context) {
 // @Produce json
 // @Router /updateUser [PATCH]
 func updateUser(c *gin.Context) {
-	checkTime()
 	header := c.Request.Header["User-Id"]
 	if len(header) == 0 {
 		log("ERROR", "Invalid User-Id given")
@@ -272,16 +266,18 @@ func updateUser(c *gin.Context) {
 // @Produce json
 // @Router /finishGame [POST]
 func finishGame(c *gin.Context) {
-	checkTime()
 	userFailed := false
+	//Get data from body
 	body, err := c.GetRawData()
 	if err != nil {
 		log("ERROR", "Failed to read request body")
 		c.JSON(http.StatusBadRequest, Response{Success: false, Context: "Failed to read request body"})
 	} else {
+		//Covert body data to boolean 
 		var status GameStatus
 		json.Unmarshal(body, &status)
 
+		//Check if User-Id is present
 		header := c.Request.Header["User-Id"]
 		if len(header) != 0 {
 			if len(header[0]) == 0 {
@@ -289,6 +285,7 @@ func finishGame(c *gin.Context) {
 				c.JSON(http.StatusBadRequest, Response{Success: false, Context: "Please enter a valid user ID"})
 				userFailed = true
 			} else {
+				//Update user field to reflect win/loss
 				var entry User
 				result := db.Where("id = ?", string(header[0])).First(&entry)
 				if entry.Active {
@@ -320,12 +317,14 @@ func finishGame(c *gin.Context) {
 			}
 		}
 		if !userFailed {
+			//User-Id not present
 			var daily selections
 			result := db.Last(&daily)
 			if result.Error != nil {
 				log("ERROR", "Failed to pull info from postgres")
 				c.JSON(http.StatusBadRequest, Response{Success: false, Context: result.Error.Error()})
 			} else {
+				//Update daily movie field to reflect win/loss
 				if status.Won {
 					daily.NumCorrect = daily.NumCorrect + 1
 				} else {
@@ -366,7 +365,7 @@ func getHost() string {
 func main() {
 	getEnv()
 	getTargetTime()
-	
+
 	gin.SetMode(gin.ReleaseMode)
 	router := gin.Default()
 
